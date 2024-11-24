@@ -1,0 +1,73 @@
+version: "3"
+
+services:
+    db: 
+        container_name: laravel-db
+        image: mysql:8.0
+        networks:
+            - laravel-net
+        volumes:
+            - laravel-db:/var/lib/mysql
+            - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+            - ./config/mysql/initdb.d:/docker-entrypoint-initdb.d
+        ports:
+            - 3306:3306
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=laravel
+            - MYSQL_USER=laravel
+            - MYSQL_PASSWORD=laravel
+            - TABLES_DIR=Tables
+            - SAMPLE_DIR=sample
+            - TZ=Asia/Tokyo
+        command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+
+    app:
+        container_name: laravel-app
+        build:
+            context: .
+            dockerfile: config/docker/Dockerfile
+        ports:
+            - "8000:80"
+            - "9003:9003"
+            - "5173:5173"
+        volumes:
+            - ./src:/var/www/html/app
+            - ./.vscode:/var/www/.vscode
+            - ./logs/apache2:/var/www/logs/apache2
+            - ./logs/xdebug:/var/www/logs/xdebug
+            - ./config/php/php.ini:/usr/local/etc/php/php.ini
+            - ./config/apache/laravel.conf:/etc/apache2/sites-available/laravel.conf
+        tty: true
+        networks:
+            - laravel-net
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        depends_on:
+            - db
+        # deploy:
+        #     resources:
+        #         limits:
+        #             memory: 2G
+
+    phpmyadmin:
+        container_name: laravel-phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        networks:
+            - laravel-net
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOSTS=db
+            - PMA_USER=laravel
+            - PMA_PASSWORD=laravel
+        links:
+            - db
+        depends_on:
+            - db
+        ports:
+            - 8001:80
+
+networks: 
+    laravel-net:
+volumes:
+    laravel-db:

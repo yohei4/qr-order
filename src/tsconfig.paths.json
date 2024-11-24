@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@app/*": [ "./app/*" ],
+      "@components/*": [ "./components/*" ],
+      "@layout/*": [ "./layout/*" ],
+      "@hooks/*": [ "./hooks/*" ],
+      "@theme/*": [ "./theme/*" ],
+      "@interfaces/*": [ "./interfaces/*" ],
+      "@enums/*": [ "./enums/*" ],
+      "@features/*": [ "./features/*" ],
+      "@utils/*": [ "./utils/*" ],
+      "@constants/*": [ "./constants/*" ],
+    }
+  }
+}
